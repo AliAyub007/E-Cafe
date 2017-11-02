@@ -14,8 +14,9 @@ public class main {
             menu.getMenu();
             menu.Choice();
             menu.orderType();
-            menu.getBill();
             menu.Address();
+            menu.sendData();
+            menu.getBill();
 
         } else System.out.println("Cafe is closed right now. Visit between 11:00 am and 10:00 pm");
 

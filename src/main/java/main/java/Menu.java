@@ -1,16 +1,19 @@
 package main.java;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.Scanner;
 
 public class Menu {
-    int[] choice = new int[100];
-    int count=0;
+    private int[] choice = new int[100];
+    private int count=0;
     static int price = 0;
     int[] time = new int[100];
-    static boolean orderType; //1 for delivery //0 for pick
-    String address;
-    int pickupTime;
-    Scanner input = new Scanner(System.in);
+    private static boolean orderType; //1 for delivery //0 for pick
+    private String address;
+    private Scanner input = new Scanner(System.in);
 
     Menu(){
         count =0;
@@ -21,28 +24,38 @@ public class Menu {
         System.out.println("---------------------------WELCOME TO E-CAFE----------------------------");
         System.out.println("Select items from the menu: ");
         System.out.println("\n----------------APPETIZERS------------------");
-        System.out.println("1- Buffalo Chicken Dips       -/200");
-        System.out.println("2- Chicken Wings              -/250");
-        System.out.println("3- Meat Balls                 -/300");
-        System.out.println("4- Pepper Poppers             -/350");
-        System.out.println("\n----------------SOUPS------------------");
-        System.out.println("5- Chicken Soup               -/200");
-        System.out.println("6- Corn Soup                  -/150");
-        System.out.println("\n----------------MAIN COURSE------------------");
-        System.out.println("7- Chicken karahi             -/450");
-        System.out.println("8- Chicken Handi              -/500");
-        System.out.println("9- Chicken Achari             -/450");
-        System.out.println("10- Mutton Handi              -/600");
-        System.out.println("11- BBQ                       -/500");
-        System.out.println("12- Mutton Karahi             -/600");
-        System.out.println("\n----------------SIDE ORDERS------------------");
-        System.out.println("13- Pasta                     -/300");
-        System.out.println("14- Fries                     -/100");
-        System.out.println("15- Drink                     -/70");
+
+        try{
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection con= DriverManager.getConnection(
+                    "jdbc:mysql://localhost/E-Cafe","root","");
+            Statement stmt=con.createStatement();
+            ResultSet rs=stmt.executeQuery("select Number,Name,Price from Appetizers");
+            while(rs.next())
+                System.out.println(rs.getInt(1) +"- "+ rs.getString(2)+"       -/"+rs.getInt(3));
+
+            System.out.println("\n----------------SOUPS------------------");
+            ResultSet rs1=stmt.executeQuery("select Number,Name,Price from Soups");
+            while(rs1.next())
+                System.out.println(rs1.getInt(1) +"- "+ rs1.getString(2)+"       -/"+rs1.getInt(3));
+
+            System.out.println("\n----------------MAIN COURSE------------------");
+            ResultSet rs2=stmt.executeQuery("select Number,Name,Price from MainCourse");
+            while(rs2.next())
+                System.out.println(rs2.getInt(1) +"- "+ rs2.getString(2)+"       -/"+rs2.getInt(3));
+
+            System.out.println("\n----------------SIDE ORDERS------------------");
+            ResultSet rs3=stmt.executeQuery("select Number,Name,Price from SideOrders");
+            while(rs3.next())
+                System.out.println(rs3.getInt(1) +"- "+ rs3.getString(2)+"       -/"+rs3.getInt(3));
+
+            con.close();
+        }catch(Exception e){ System.out.println(e);}
     }
 
+
     public void Choice(){
-        System.out.println("Enter your order by entering associated number and type -1 to exit\n");
+        System.out.println("\nEnter your order by entering associated number and type -1 to exit\n");
 
         for(;;){
             choice[count] = input.nextInt();
@@ -152,8 +165,29 @@ public class Menu {
 
     }
 
+    public void sendData(){
+        try{
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection con= DriverManager.getConnection(
+                    "jdbc:mysql://localhost/E-Cafe","root","");
+            Statement stmt=con.createStatement();
+            boolean rs=stmt.execute("INSERT INTO `Data`(`Address`,`Bill`) VALUES (\""+address+"\","+price+")");
+
+        }catch(Exception e){ System.out.println(e);}
+    }
+
     public void getBill(){
-        System.out.println("Total Bill is: " + price);
+        try{
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection con= DriverManager.getConnection(
+                    "jdbc:mysql://localhost/E-Cafe","root","");
+            Statement stmt=con.createStatement();
+            ResultSet rs=stmt.executeQuery("select * from Data");
+
+            while(rs.next())
+                System.out.println("Address is: "+rs.getString(1)+"\nTotal Price is: "+rs.getInt(2));
+
+        }catch(Exception e){ System.out.println(e);}
     }
 
     public void getTime(){
@@ -178,8 +212,8 @@ public class Menu {
             System.out.println("Thank you for your order.Your order will be delivered with in 30 minutes");
         } else {
             System.out.println("Enter your pickup time: ");
-            pickupTime = input.nextInt();
-            System.out.println("Thank you for your order.Pick your order at " + pickupTime+ ":00");
+            int pickupTime = input.nextInt();
+            System.out.println("Thank you for your order.Pick your order at " + pickupTime + ":00");
         }
     }
 }
