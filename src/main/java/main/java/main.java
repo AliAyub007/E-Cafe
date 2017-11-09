@@ -22,13 +22,13 @@ public class main {
 
     }
 
-    private static String getTime(){
+    public static String getTime(){
         DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         Date date = new Date();
         return dateFormat.format(date);
     }
 
-    private static boolean isOpen(){
+    public static boolean isOpen(){
         time = getTime();
         timeBreak = time.split(":");
         if(Integer.parseInt(timeBreak[0]) >= 11 && Integer.parseInt(timeBreak[0]) < 22){

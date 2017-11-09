@@ -1,9 +1,6 @@
 package main.java;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.Scanner;
 
 public class Menu {
@@ -15,7 +12,7 @@ public class Menu {
     private String address;
     private Scanner input = new Scanner(System.in);
 
-    Menu(){
+    public Menu(){
         count =0;
         price =0;
     }
@@ -170,9 +167,12 @@ public class Menu {
             Class.forName("com.mysql.jdbc.Driver");
             Connection con= DriverManager.getConnection(
                     "jdbc:mysql://localhost/E-Cafe","root","");
-            Statement stmt=con.createStatement();
-            boolean rs=stmt.execute("INSERT INTO `Data`(`Address`,`Bill`) VALUES (\""+address+"\","+price+")");
-
+            String sql = "INSERT INTO `Data`(`Address`,`Bill`) VALUES (?,?)";
+            PreparedStatement stmt=con.prepareStatement(sql);
+            stmt.setString(1,address);
+            stmt.setInt(2,price);
+            int rs=stmt.executeUpdate();
+            System.out.println("Data Updated...");
         }catch(Exception e){ System.out.println(e);}
     }
 
@@ -217,4 +217,3 @@ public class Menu {
         }
     }
 }
-
